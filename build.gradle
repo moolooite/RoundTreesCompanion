@@ -1,9 +1,14 @@
 plugins {
-    id 'fabric-loom' version '1.4.1'
+    id 'fabric-loom' version '1.13.6'
 }
 
+// Build for a Minecraft version with -Pmc=<version>, see versions/
+def mc = project.findProperty('mc') ?: project.default_mc
+def target = new Properties()
+file("versions/${mc}.properties").withInputStream { target.load(it) }
+
 group = 'com.roundtrees'
-version = '1.20+_1.0.0'
+version = "${target.jar_name}_${project.mod_version}"
 
 repositories {
     mavenCentral()
@@ -11,15 +16,18 @@ repositories {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:1.20.1"
-    mappings "net.fabricmc:yarn:1.20.1+build.10:v2"
-    modImplementation "net.fabricmc:fabric-loader:0.14.21"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.85.0+1.20.1"
-    annotationProcessor "net.fabricmc:sponge-mixin:0.12.5+mixin.0.8.5"
+    minecraft "com.mojang:minecraft:${target.minecraft_version}"
+    mappings "net.fabricmc:yarn:${target.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 }
 
 tasks.withType(ProcessResources).configureEach {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    def props = [version: project.mod_version, minecraft_range: target.minecraft_range, java_version: target.java_version]
+    inputs.properties props
+    filesMatching(['fabric.mod.json', 'mixins.roundtreescompanion.json']) {
+        expand props
+    }
 }
 
 loom {
@@ -30,12 +38,12 @@ loom {
             resources.srcDirs = ["src/main/resources"]
         }
         client {
-            java.srcDirs = ["src/client/java"]
+            java.srcDirs = ["src/client/java", "src/versions/${mc}/java"]
             resources.srcDirs = ["src/client/resources"]
         }
     }
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(target.java_version as int))
 }
