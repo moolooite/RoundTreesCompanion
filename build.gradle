@@ -1,49 +1,101 @@
 plugins {
-    id 'fabric-loom' version '1.13.6'
+    id 'net.fabricmc.fabric-loom-remap' version '1.19.4' apply false
+    id 'net.fabricmc.fabric-loom' version '1.19.4' apply false
+    id 'net.neoforged.moddev' version '2.0.148' apply false
+    id 'net.neoforged.moddev.legacyforge' version '2.0.148' apply false
 }
 
-// Build for a Minecraft version with -Pmc=<version>, see versions/
-def mc = project.findProperty('mc') ?: project.default_mc
-def target = new Properties()
-file("versions/${mc}.properties").withInputStream { target.load(it) }
+// Every folder in versions/ builds one jar into dist/. Its gradle.properties says which loaders
+// and Minecraft version it is for and which of the src/ folders it is made of.
+subprojects {
+    def loaders = project.loaders.split(',') as List
+    // Minecraft is not obfuscated anymore since 26.1, so the same jar runs on every loader
+    def obfuscated = !project.minecraft_version.startsWith('26.')
+    def mixinPackage = 'com/roundtrees/roundtreescompanion/mixin'
 
-group = 'com.roundtrees'
-version = "${target.jar_name}_${project.mod_version}"
-
-repositories {
-    mavenCentral()
-    maven { url = 'https://maven.fabricmc.net/' }
-}
-
-dependencies {
-    minecraft "com.mojang:minecraft:${target.minecraft_version}"
-    mappings "net.fabricmc:yarn:${target.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-}
-
-tasks.withType(ProcessResources).configureEach {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    def props = [version: project.mod_version, minecraft_range: target.minecraft_range, java_version: target.java_version]
-    inputs.properties props
-    filesMatching(['fabric.mod.json', 'mixins.roundtreescompanion.json']) {
-        expand props
+    if (loaders[0] == 'forge') {
+        apply plugin: 'net.neoforged.moddev.legacyforge'
+    } else if (loaders[0] == 'neoforge') {
+        apply plugin: 'net.neoforged.moddev'
+    } else {
+        apply plugin: obfuscated ? 'net.fabricmc.fabric-loom-remap' : 'net.fabricmc.fabric-loom'
     }
-}
 
-loom {
-    splitEnvironmentSourceSets()
-    sourceSets {
-        main {
-            java.srcDirs = []
-            resources.srcDirs = ["src/main/resources"]
+    version = "${project.mod_version}-${project.name}"
+    base.archivesName = 'RoundTreesCompanion'
+
+    def sourceDirs = ['main'] + (project.sources.split(',') as List)
+    sourceSets.main {
+        java.srcDirs = sourceDirs.collect { rootProject.file("src/${it}/java") }
+        resources.srcDirs = [rootProject.file('src/main/resources')]
+    }
+
+    java.toolchain.languageVersion = JavaLanguageVersion.of(project.java_version as int)
+
+    if (loaders[0] == 'forge') {
+        legacyForge {
+            version = project.forge_version
         }
-        client {
-            java.srcDirs = ["src/client/java", "src/versions/${mc}/java"]
-            resources.srcDirs = ["src/client/resources"]
+        mixin {
+            add sourceSets.main, 'roundtreescompanion.refmap.json'
+            config 'mixins.roundtreescompanion.json'
+        }
+        dependencies {
+            annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+        }
+        jar.manifest.attributes 'MixinConfigs': 'mixins.roundtreescompanion.json'
+    } else if (loaders[0] == 'neoforge') {
+        neoForge {
+            version = project.neoforge_version
+        }
+    } else {
+        dependencies {
+            minecraft "com.mojang:minecraft:${project.minecraft_version}"
+            if (obfuscated) {
+                mappings loom.officialMojangMappings()
+                modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+            } else {
+                implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+            }
         }
     }
-}
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(target.java_version as int))
+    processResources {
+        // Only the metadata of the loaders this jar is for
+        if (!loaders.contains('fabric')) exclude 'fabric.mod.json'
+        if (!loaders.contains('neoforge')) exclude 'META-INF/neoforge.mods.toml'
+        // Forge shows a warning screen for mods without a pack.mcmeta
+        if (!loaders.contains('forge')) exclude 'META-INF/mods.toml', 'pack.mcmeta'
+
+        def mixins = sourceDirs.collectMany { dir ->
+            fileTree(rootProject.file("src/${dir}/java/${mixinPackage}")).files.collect { it.name - '.java' }
+        }.sort()
+        def props = [
+            version       : project.mod_version,
+            java_version  : project.java_version,
+            mixins        : mixins.collect { "\"${it}\"" }.join(', '),
+            // Forge's Mixin needs a refmap and logs an error without a minVersion
+            min_version   : loaders[0] == 'forge' ? '\n  "minVersion": "0.8",' : '',
+            refmap        : loaders[0] == 'forge' ? '\n  "refmap": "roundtreescompanion.refmap.json",' : '',
+            fabric_range  : project.findProperty('fabric_range') ?: '',
+            neoforge_range: project.findProperty('neoforge_range') ?: '',
+            forge_range   : project.findProperty('forge_range') ?: ''
+        ]
+        inputs.properties props
+        filesMatching(['fabric.mod.json', 'META-INF/*.toml', 'mixins.roundtreescompanion.json']) {
+            expand props
+        }
+    }
+
+    jar {
+        from(rootProject.file('LICENSE')) {
+            rename { 'LICENSE_roundtreescompanion' }
+        }
+    }
+
+    // The jar players use: remapped for Fabric, reobfuscated for Forge
+    def release = loaders[0] == 'forge' ? tasks.named('reobfJar') : obfuscated && loaders[0] == 'fabric' ? tasks.named('remapJar') : tasks.named('jar')
+    release.configure {
+        destinationDirectory = rootProject.layout.projectDirectory.dir('dist')
+    }
 }

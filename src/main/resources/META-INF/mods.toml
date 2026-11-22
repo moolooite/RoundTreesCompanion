@@ -1,0 +1,20 @@
+modLoader = "javafml"
+loaderVersion = "[40,)"
+license = "MIT"
+issueTrackerURL = "https://github.com/moolooite/RoundTreesCompanion/issues"
+clientSideOnly = true
+
+[[mods]]
+modId = "roundtreescompanion"
+version = "${version}"
+displayName = "Round Trees Companion"
+displayURL = "https://modrinth.com/mod/roundtreescompanion"
+authors = "Astrophyllite"
+description = "Shifts wall signs, ladders and wall torches forward when placed on logs to prevent z-fighting with round tree texture packs."
+
+[[dependencies.roundtreescompanion]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${forge_range}"
+ordering = "NONE"
+side = "CLIENT"

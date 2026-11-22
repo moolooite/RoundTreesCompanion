@@ -1,9 +1,7 @@
-# Gradle
 .gradle/
 build/
-run/
-run-prod/
 dist/
-
-# Visual Studio Code
+run/
+runs/
 .vscode/
+.idea/
