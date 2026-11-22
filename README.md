@@ -1,89 +1,64 @@
 # Round Trees Companion
 
-A Minecraft Fabric mod that prevents z-fighting between wall signs, ladders, torches, and round tree texture packs by subtly shifting them forward when placed on logs.
+Round tree resource packs make logs round, so anything hung on the side of a log ends up clipping into the bark. This mod nudges wall signs, ladders and wall torches forward a little when they're placed on a log.
 
-## Features
+- Wall signs: 1 pixel
+- Ladders: 1.4 pixels
+- Wall torches, soul wall torches and redstone wall torches: 1 pixel
 
-- **Wall Sign Compatibility**: Automatically shifts wall signs forward by 1/16 block when placed on any log block
-- **Ladder Compatibility**: Shifts ladders forward when placed on logs to prevent visual clipping with round tree textures
-- **Torch Compatibility**: Shifts wall torches, soul torches and redstone torches forward when placed on logs
-- **Seamless Integration**: Works automatically without configuration - just install and play
-- **Texture Pack Agnostic**: Compatible with any round tree texture pack
+Only blocks on the side of a log are moved. On other blocks, and on the flat end of a sideways log, nothing changes. Logs are anything in the `#minecraft:logs` tag, so modded logs work if they're tagged.
+
+The shift is visual only. Hitboxes, placement and the world itself are untouched.
+
+## Downloads
+
+| Loader | Minecraft | File |
+| --- | --- | --- |
+| Fabric, Quilt, NeoForge | 26.1 - 26.3 | `fabric-neoforge-26.1-26.3` |
+| Fabric, Quilt | 1.21.9 - 1.21.11 | `fabric-1.21.9-1.21.11` |
+| Fabric, Quilt | 1.21.4 - 1.21.8 | `fabric-1.21.4-1.21.8` |
+| Fabric, Quilt | 1.21.2 - 1.21.3 | `fabric-1.21.2-1.21.3` |
+| Fabric, Quilt | 1.18.2 - 1.21.1 | `fabric-1.18.2-1.21.1` |
+| NeoForge | 1.21 - 1.21.1 | `neoforge-1.21-1.21.1` |
+| Forge | 1.18.2 - 1.20.1 | `forge-1.18.2-1.20.1` |
+
+The Forge file also works on NeoForge 1.20.1.
+
+Get them from [Modrinth](https://modrinth.com/mod/roundtreescompanion) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/roundtreescompanion).
+
+## Requirements
+
+- No dependencies. Fabric API is not needed.
+- Client only. Servers don't need it and it works on any server. If it ends up in a server's mods folder it does nothing there.
+- A round tree resource pack, such as [Round Trees](https://modrinth.com/resourcepack/round-trees). Without one the mod still works, there's just nothing to fix.
+
+## Install
+
+1. Install Fabric, Quilt, NeoForge or Forge for your Minecraft version.
+2. Put the jar for your loader and version in the `mods` folder.
 
 ## Compatibility
 
-- **Minecraft**: 1.20.0 - 1.21.4
-- **Mod Loader**: Fabric Loader 0.14.0+
-- **Dependencies**: None
+Works with Sodium, Embeddium and Iris. It adds no blocks, items, config or network traffic, and it only does anything while a wall sign, ladder or wall torch is being drawn, so it's safe to drop into any pack. If another mod gets in the way of one of its hooks, that part is skipped instead of crashing.
 
-There are separate downloads for 1.20 - 1.21.1, 1.21.2 - 1.21.3 and 1.21.4, make sure to grab the one for your version.
+One known limit on 1.21.2 and newer: ladders, torches and signs drawn from a world you're not in (schematic previews, moving contraptions) may not be shifted correctly.
 
-## Installation
+## Building
 
-1. Install [Fabric Loader](https://fabricmc.net/use/installer/) for your Minecraft version
-2. Download Round Trees Companion from [Modrinth](https://modrinth.com/mod/round-trees-companion) and place it in your mods folder
-3. Launch Minecraft with the Fabric profile
+Needs JDK 25 to run Gradle. JDK 17 and 21 are also used and get downloaded if missing.
 
-## How It Works
+```bash
+./gradlew build
+```
 
-### Wall Signs
-The mod uses a client-side mixin to detect when wall signs are placed on log blocks and automatically translates their rendering position forward by 1/16 block (1 pixel). This prevents the sign from appearing to "sink into" round tree textures.
+All jars end up in `dist/`. Each folder in `versions/` is one jar, its `gradle.properties` says which Minecraft version it's built against and which folders in `src/` it uses.
 
-### Ladders and Torches
-Ladders and wall torches placed on logs are moved forward using the block's model offset (the same thing vanilla uses to randomly offset flowers). Ladders are shifted by 1.4 pixels and torches by 1 pixel. Ladders and torches on other blocks aren't touched.
+## Links
 
-Signs, ladders and torches on the flat end of a sideways log are left alone, since round tree packs don't change log ends.
-
-## Technical Details
-
-- **Wall Signs**: Implemented via `SignBlockEntityRendererMixin` that checks for log blocks behind wall signs
-- **Ladders and Torches**: Implemented via `BlockStateMixin` which offsets the model of ladders and wall torches on logs, this also works with Sodium
-- **Performance**: Minimal performance impact - only processes wall signs, ladders and wall torches
-
-## Supported Blocks
-
-### Logs (Auto-detected via BlockTags.LOGS)
-- Oak Log
-- Spruce Log  
-- Birch Log
-- Jungle Log
-- Acacia Log
-- Dark Oak Log
-- Mangrove Log
-- Cherry Log
-- Crimson Stem
-- Warped Stem
-- And any modded logs that use the `#minecraft:logs` tag
-
-### Signs
-- All vanilla wall sign variants (oak, spruce, birch, jungle, acacia, dark oak, mangrove, cherry, bamboo, crimson, warped)
-- Compatible with modded wall signs that extend `WallSignBlock`
-
-### Torches
-- Wall torches, soul torches and redstone torches
-- Compatible with modded wall torches that extend `WallTorchBlock`
-
-## FAQ
-
-**Q: Will this affect signs, ladders or torches placed on other blocks?**  
-A: No, the mod only shifts them when they're placed specifically on log blocks.
-
-**Q: Is this compatible with other sign mods?**  
-A: Yes, as long as they extend the vanilla `WallSignBlock` class.
-
-**Q: Does this work with Sodium?**  
-A: Yes.
-
-**Q: Does this work in multiplayer?**  
-A: Yes, this is a client-side only mod that works on any server.
-
-**Q: Will this break my existing signs?**  
-A: No, existing signs will automatically benefit from the fix without any changes needed.
+- [Modrinth](https://modrinth.com/mod/roundtreescompanion)
+- [CurseForge](https://www.curseforge.com/minecraft/mc-mods/roundtreescompanion)
+- [GitHub](https://github.com/moolooite/RoundTreesCompanion)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Issues & Support
-
-Found a bug or have a suggestion? Please open an issue on the [GitHub repository](https://github.com/moolooite/RoundTreesCompanion).
+[MIT](LICENSE)

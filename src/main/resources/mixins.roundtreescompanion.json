@@ -1,0 +1,6 @@
+{
+  "required": false,${min_version}
+  "package": "com.roundtrees.roundtreescompanion.mixin",
+  "compatibilityLevel": "JAVA_${java_version}",${refmap}
+  "client": [${mixins}]
+}

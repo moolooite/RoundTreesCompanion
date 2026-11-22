@@ -1,18 +1,20 @@
-{  "schemaVersion": 1,
+{
+  "schemaVersion": 1,
   "id": "roundtreescompanion",
   "version": "${version}",
   "name": "Round Trees Companion",
-  "description": "Shifts wall signs, ladders and wall torches forward when placed on logs to prevent z-fighting with round tree texture packs. Uses mixins for wall signs and model offsets for ladders and torches.",
+  "description": "Shifts wall signs, ladders and wall torches forward when placed on logs to prevent z-fighting with round tree texture packs.",
   "authors": ["Astrophyllite"],
-  "environment": "*",
-  "mixins": [
-    {
-      "config": "mixins.roundtreescompanion.json",
-      "environment": "client"
-    }
-  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/roundtreescompanion",
+    "sources": "https://github.com/moolooite/RoundTreesCompanion",
+    "issues": "https://github.com/moolooite/RoundTreesCompanion/issues"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "mixins": ["mixins.roundtreescompanion.json"],
   "depends": {
     "fabricloader": ">=0.14.0",
-    "minecraft": "${minecraft_range}"
+    "minecraft": "${fabric_range}"
   }
 }
