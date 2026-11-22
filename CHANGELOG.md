@@ -11,7 +11,7 @@
 - Fixed a possible crash on 1.21.2+ when a block changed while a chunk with ladders or torches on logs was being rebuilt
 - Fabric: now marked as client-only, so dedicated servers skip it
 - A little less work per block while chunks are built
-- The licence is now included in the jars
+- The license is now included in the jars
 - Jars are now named `RoundTreesCompanion-<version>-<loader>-<minecraft>.jar`
 
 ## 1.1.0
