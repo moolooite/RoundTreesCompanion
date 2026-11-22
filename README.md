@@ -53,6 +53,14 @@ Needs JDK 25 to run Gradle. JDK 17 and 21 are also used and get downloaded if mi
 
 All jars end up in `dist/`. Each folder in `versions/` is one jar, its `gradle.properties` says which Minecraft version it's built against and which folders in `src/` it uses.
 
+## Testing
+
+```bash
+tests/launchtest.py
+```
+
+Launches every jar in `dist/` on a real client and server, see [docs/maintaining.md](docs/maintaining.md).
+
 ## Links
 
 - [Modrinth](https://modrinth.com/mod/roundtreescompanion)

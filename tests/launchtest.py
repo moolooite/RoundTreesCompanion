@@ -8,8 +8,9 @@ with and without the jar, and compares the two screenshots.
     tests/launchtest.py                                   every case in tests/cases.txt
     tests/launchtest.py fabric 1.21.1 0.20.1 fabric-1.18.2-1.21.1 [sodium,lithium]
 
-Linux only. Needs Xvfb, xdotool, ImageMagick and JDK 17, 21 and 25. Software rendering is
-enough, 26.3 and up also want a Vulkan driver (lavapipe works). Everything is kept in run/.
+Linux only. Needs Xvfb, xdotool, ImageMagick and JDK 17, 21 and 25, looked up in /usr/lib/jvm
+or in JAVA17_HOME, JAVA21_HOME and JAVA25_HOME. Software rendering is enough, 26.3 and up also
+want a Vulkan driver (lavapipe works). Everything is kept in run/.
 """
 import glob
 import json

@@ -1,5 +1,6 @@
 # loader  minecraft  loader version  jar  [mods from Modrinth to run next to, comma separated]
-# Lowest and highest version of every jar, the highest also next to the usual performance mods.
+# Lowest and highest version of every jar, alone and next to the usual performance mods.
+# Mods that don't load together on a version are left out of that line.
 
 fabric    1.18.2   0.20.1      fabric-1.18.2-1.21.1
 fabric    1.21.1   0.20.1      fabric-1.18.2-1.21.1
@@ -31,4 +32,7 @@ forge     1.20.1   47.4.29     forge-1.18.2-1.20.1         embeddium,oculus,cana
 # Loaders that run a jar built for another one
 neoforge  1.20.1   47.1.106    forge-1.18.2-1.20.1
 quilt     1.21.1   0.30.2      fabric-1.18.2-1.21.1
+quilt     1.21.3   0.30.2      fabric-1.21.2-1.21.3
+quilt     1.21.8   0.30.2      fabric-1.21.4-1.21.8
+quilt     1.21.11  0.30.2      fabric-1.21.9-1.21.11
 quilt     26.3     0.30.2      fabric-neoforge-26.1-26.3

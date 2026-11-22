@@ -63,11 +63,11 @@ A supported version is written down in these places, and all of them change toge
 
 ## Pre-release checks
 
-`./gradlew build` builds every jar into `dist/`. [`tests/launchtest.py`](../tests/launchtest.py) then runs every case in [`tests/cases.txt`](../tests/cases.txt): the lowest and highest version of each jar, the highest also next to Sodium, Lithium, FerriteCore, ModernFix and Iris, or Embeddium, Oculus and Canary on Forge.
+`./gradlew build` builds every jar into `dist/`. [`tests/launchtest.py`](../tests/launchtest.py) then runs every case in [`tests/cases.txt`](../tests/cases.txt): the lowest and highest version of each jar, alone and next to Sodium, Lithium, FerriteCore, ModernFix and Iris, or Embeddium, Oculus and Canary on Forge, and the loaders that run a jar built for another one.
 
 A case installs the loader, starts a dedicated server with the jar, joins the world it made on a client with and without the jar and compares the screenshots. It passes when the server starts, both clients get into the world, the mod's hooks are applied and the ladders, signs and torches on logs have moved. The screenshots are kept in `run/shots/`.
 
-It runs on Linux with Xvfb, xdotool, ImageMagick and JDK 17, 21 and 25. Software rendering is enough.
+It runs on Linux with Xvfb, xdotool, ImageMagick and JDK 17, 21 and 25, looked up in `/usr/lib/jvm` or in `JAVA17_HOME`, `JAVA21_HOME` and `JAVA25_HOME`. Software rendering is enough.
 
 | Known trap | Handled by |
 | --- | --- |
